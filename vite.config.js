@@ -7,14 +7,6 @@ export default defineConfig({
   base: '/digital-art-gallery/', 
   
   plugins: [],
-  css: {
-    postcss: {
-      plugins: [
-        tailwindcss(),
-        autoprefixer(),
-      ],
-    },
-  },
   build: {
     outDir: 'dist',
     rollupOptions: {

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Art Gallery - Explore Unique Artworks</title>
+    <link rel="stylesheet" href="../dist/output.css">
+    <link href="css/styles.css" rel="stylesheet">
+    <script src="js/alpine/galleryComponent.js" defer></script>
+    <style>
+        /* Add simple transition for the sidebar */
+        /* .sidebar { transition: transform 0.3s ease-in-out; } <-- Commented out as transition is handled by x-transition */
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 font-sans antialiased" x-data="gallery" x-cloak>
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:p-4 focus:rounded-lg focus:shadow-lg">
+        Skip to main content
+    </a>
+
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Digital Art Gallery</h1>
+
+        <!-- Mobile-only Elements -->
+        <div class="md:hidden">
+            <!-- Mobile Filter Button -->
+            <div class="mb-4">
+                <button @click="toggleMobileMenu()" class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">
+                    Filters
+                </button>
+            </div>
+
+            <!-- Mobile Overlay -->
+            <div x-show="isMobileMenuOpen"
+                 x-transition:enter="transition-opacity ease-linear duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition-opacity ease-linear duration-300"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 @click="isMobileMenuOpen = false"
+                 class="fixed inset-0 bg-black bg-opacity-50 z-30"
+                 aria-hidden="true"></div>
+        </div>
+        <!-- End Mobile-only Elements -->
+
+        <div class="flex flex-col md:flex-row md:gap-8 relative">
+
+            <!-- Mobile Off-Canvas Sidebar -->
+            <aside
+                class="sidebar fixed inset-y-0 left-0 z-40 w-64 max-w-[80vw] md:hidden /* Hidden on desktop */
+                       bg-white p-6 rounded-lg shadow-md space-y-6 flex-shrink-0 
+                       overflow-y-auto h-[calc(100vh-4rem)]"
+                x-show="isMobileMenuOpen"
+                x-transition:enter="transition ease-out duration-300 transform"
+                x-transition:enter-start="-translate-x-full"
+                x-transition:enter-end="translate-x-0"
+                x-transition:leave="transition ease-in duration-300 transform"
+                x-transition:leave-start="translate-x-0"
+                x-transition:leave-end="-translate-x-full"
+                @click.away="if (isMobileMenuOpen) isMobileMenuOpen = false"
+                x-init="$watch('isMobileMenuOpen', value => { if (value) { document.body.style.overflow = 'hidden'; } else { document.body.style.overflow = ''; } })"
+                x-bind:aria-hidden="!isMobileMenuOpen"
+                aria-modal="true"
+                role="dialog">
+
+                 <!-- Close button for mobile -->
+                 <button @click="isMobileMenuOpen = false" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                 </button>
+
+                 <!-- Mobile Sidebar Content (Search + Filters) -->
+                 <div class="search-section">
+                     <label for="search-mobile" class="text-base md:text-lg font-semibold text-gray-700 mb-4">Search Artworks</label>
+                     <input type="search" id="search-mobile" x-model="searchQuery" class="search-input" placeholder="Search by title or artist...">
+                 </div>
+                 <div class="filter-section space-y-4">
+                     <h3 class="text-base md:text-lg font-semibold text-gray-700">Filter by Style</h3>
+                     <template x-for="[categoryName, styles] in Object.entries(categories)" :key="categoryName + '-mobile'">
+                         <div class="category-group border-t border-gray-200 pt-4">
+                             <h4 class="font-medium text-gray-800 mb-2" x-text="categoryName"></h4>
+                             <div class="flex flex-wrap gap-2">
+                                 <template x-for="style in styles" :key="style + '-mobile'">
+                                     <button 
+                                         type="button" 
+                                         class="filter-button text-sm" 
+                                         @click="toggleStyle(style)" 
+                                         :aria-pressed="isStyleSelected(style)" 
+                                         :class="{ 'filter-button-active': isStyleSelected(style) }" 
+                                         x-text="style"></button>
+                                 </template>
+                             </div>
+                         </div>
+                     </template>
+                 </div>
+            </aside>
+
+            <!-- Desktop Sticky Sidebar -->
+            <aside class="sidebar hidden md:block w-64 flex-shrink-0 
+                        md:sticky md:top-8 space-y-6 
+                        md:overflow-y-auto md:max-h-[calc(100vh-4rem)]">
+                <!-- Desktop Sidebar Content (Search + Filters) -->
+                 <div class="search-section">
+                     <label for="search-desktop" class="text-base md:text-lg font-semibold text-gray-700 mb-4">Search Artworks</label>
+                     <input type="search" id="search-desktop" x-model="searchQuery" class="search-input" placeholder="Search by title or artist...">
+                 </div>
+                 <div class="filter-section space-y-4">
+                     <h3 class="text-base md:text-lg font-semibold text-gray-700">Filter by Style</h3>
+                      <template x-for="[categoryName, styles] in Object.entries(categories)" :key="categoryName + '-desktop'">
+                         <div class="category-group border-t border-gray-200 pt-4 first:border-t-0">
+                             <h4 class="font-medium text-gray-800 mb-2" x-text="categoryName"></h4>
+                             <div class="flex flex-wrap gap-2">
+                                 <template x-for="style in styles" :key="style + '-desktop'">
+                                     <button 
+                                        type="button" 
+                                        class="filter-button text-sm" 
+                                        @click="toggleStyle(style)" 
+                                        :aria-pressed="isStyleSelected(style)" 
+                                        :class="{ 'filter-button-active': isStyleSelected(style) }" 
+                                        x-text="style"></button>
+                                 </template>
+                             </div>
+                         </div>
+                     </template>
+                 </div>
+            </aside>
+
+            <!-- Main Content -->
+             <main id="main-content" class="main-content flex-1 mt-8 md:mt-0">
+                 <div class="gallery-grid">
+                     <!-- Artwork Cards -->
+                     <template x-for="artwork in filteredArtworks" :key="artwork.id">
+                         <article class="artwork-card bg-white rounded-lg shadow-sm overflow-hidden border border-[var(--color-border)]">
+                             <div class="aspect-w-4 aspect-h-3">
+                                 <img 
+                                     :src="artwork.image" 
+                                     alt="Artwork" 
+                                     class="w-full h-full object-cover" 
+                                     loading="lazy" 
+                                     title="Explore artwork details"
+                                     onerror="this.onerror=null; this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';"
+                                 >
+                             </div>
+                             <div class="artwork-info p-4">
+                                 <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-1" x-text="artwork.title"></h3>
+                                 <p class="text-gray-600 mb-2" x-text="artwork.artist"></p>
+                                 <div class="flex justify-between items-center">
+                                     <p class="text-blue-600 font-medium" x-text="artwork.price + ' ETH'"></p>
+                                     <span class="text-sm text-gray-500 px-2 py-1 bg-gray-100 rounded" x-text="artwork.style"></span>
+                                 </div>
+                             </div>
+                         </article>
+                     </template>
+
+                     <!-- No Results Message -->
+                     <template x-if="filteredArtworks.length === 0">
+                         <p>No artworks found.</p>
+                     </template>
+                 </div>
+             </main>
+        </div>
+    </div>
+
+    <footer role="contentinfo" class="bg-gray-100 py-6 mt-12">
+        <div class="container mx-auto px-4">
+            <p>&copy; 2024 Digital Art Gallery. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Load main JavaScript file as a module -->
+    <script type="module" src="js/main.js" defer></script>
+</body>
+</html>

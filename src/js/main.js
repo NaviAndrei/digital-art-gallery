@@ -1,3 +1,5 @@
+import '../css/styles.css'; // Import the main stylesheet
+
 import Alpine from '../../node_modules/alpinejs/dist/module.esm.js'
 
 window.Alpine = Alpine

@@ -1,8 +1,3 @@
-/* Tailwind directives - Note: These require a build step to function fully */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 :root {
     /* Core Colors */
     --color-bg-main: #ffffff;

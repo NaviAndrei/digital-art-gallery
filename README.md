@@ -1,6 +1,6 @@
 # Digital Art Gallery
 
-[![Static Website Project](https://img.shields.io/badge/Project-Static%20Website-blue)](https://github.com/NaviAndrei/Static-Website-Project) <!-- Replace with your actual repo link -->
+[![Static Website Project](https://img.shields.io/badge/Project-Static%20Website-blue)](https://naviandrei.github.io/digital-art-gallery/) 
 
 A responsive, interactive web application showcasing digital artwork with filtering and search capabilities, built with **Tailwind CSS** and **Alpine.js**.
 
@@ -107,7 +107,7 @@ Static-Website-Project/
 ## 🌐 Live Demo
 
 <!-- Add a link to your deployed application (e.g., GitHub Pages, Netlify, Vercel) -->
-**[View Live Demo](PLACEHOLDER_LIVE_DEMO_URL)**
+**[View Live Demo](https://naviandrei.github.io/digital-art-gallery/)**
 
 ## 🙏 Acknowledgements
 
